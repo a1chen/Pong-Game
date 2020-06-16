@@ -8,8 +8,8 @@ import java.awt.event.KeyListener;
 
 public class Paddle extends Rectangle implements KeyListener{
 
-	double dy, speed = 50;
-	Color c1;
+	double dy, speed = 25;
+	Color cRed;
 	boolean isUpPressed, isDownPressed;
 	int keyUp, keyDown;
 	Font f1 = new Font("ComicSansMS", 100,100);
@@ -17,9 +17,9 @@ public class Paddle extends Rectangle implements KeyListener{
 	
 	public Paddle(int x, int y, int akeyUp, int akeyDown) {
 		
-		super(x, y, 50, 400);
+		super(x, y, 25, 200);
 		dy = 0;
-		c1 = Color.RED;
+		cRed = Color.RED;
 		isUpPressed = false;
 		keyUp = akeyUp;
 		keyDown = akeyDown;
@@ -39,7 +39,7 @@ public class Paddle extends Rectangle implements KeyListener{
 			dy = -speed;
 		}
 		//prevent from moving out of bounds
-		if(this.getY() + dy > 1600 || this.getY() +dy < -50) {
+		if(this.getY() + dy + 200 > 900 || this.getY() + dy < -50) {
 			dy = 0;
 		}
 		
@@ -47,7 +47,7 @@ public class Paddle extends Rectangle implements KeyListener{
 		
 		
 		//draw
-		win.setColor(c1);
+		win.setColor(cRed);
 		win.fill(this);
 	}
 	
@@ -59,7 +59,7 @@ public class Paddle extends Rectangle implements KeyListener{
 		if (ball.getY() < paddle.getY()) {
 			dy = -speed;
 		}
-		if(this.getY() + dy > 1700 || this.getY() +dy < 0) {
+		if(this.getY() + 200 + dy > 900 || this.getY() +dy < 0) {
 			dy = 0;
 		}
 		
@@ -67,7 +67,7 @@ public class Paddle extends Rectangle implements KeyListener{
 		
 		
 		//draw
-		win.setColor(c1);
+		win.setColor(cRed);
 		win.fill(this);
 	}
 	@Override
