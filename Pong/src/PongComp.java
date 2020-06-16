@@ -30,7 +30,7 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 	Ball ball;
 	Font impactSmall = new Font("Impact", 100,100);
 	Font impactSmaller = new Font("Impact", 25, 25);
-
+	
 	Color cBlack = Color.BLACK;
 	Color cRed = Color.RED;
 	
@@ -38,23 +38,17 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 	
 	//starts the game
 	public void start() {
-		if (hasStartedGame == false) { // prevent from player needing to keep choosing speed
+		if (!hasStartedGame) { // prevent from player needing to keep choosing speed
 			
 			left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
 			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
 			ball = new Ball(left, right, speedLevel);
-			powerUp1 = new powerUp (ball, left, right, numHitLeft, numHitRight);
 			this.addKeyListener(left);
 			this.addKeyListener(right);
 			gameState = STATE_CHOOSE_SPEED;
 			
-		} else {
-			left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
-			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
+		} else {	
 			ball = new Ball(left, right, speedLevel);
-			powerUp1 = new powerUp (ball, left, right, numHitLeft, numHitRight);
-			this.addKeyListener(left);
-			this.addKeyListener(right);
 			gameState = STATE_TWO_PLAYER_START;
 		}
 	}
@@ -72,11 +66,18 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 	}
 	
 	public void computerStart() { //computer mode
-		left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
-		right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
-		ball = new Ball(left, right, speedLevel);
-		this.addKeyListener(right);
-		gameState = STATE_SINGLE_PLAYER_START;
+		if(!hasStartedGame) {
+			left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
+			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
+			ball = new Ball(left, right, speedLevel);
+			this.addKeyListener(right);
+			gameState = STATE_SINGLE_PLAYER_START;
+			hasStartedGame = true;
+		} else {
+			ball = new Ball(left, right, speedLevel);
+			gameState = STATE_SINGLE_PLAYER_START;
+		}
+		
 	}
 	
 	//score counter
@@ -184,10 +185,9 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 				this.addKeyListener(this);
 			}
 			
-			if (scoreRight == STATE_SINGLE_PLAYER_SERVE) {
+			if (scoreRight == POINTS_TO_WIN) {
 				win.setFont(impactSmall);
 				win.setColor(Color.WHITE);
-
 				win.drawString("Right player is the winner!", 350, 450);
 				win.drawString("Press \"i\" to restart", 550, 550);
 				this.addKeyListener(this);
@@ -283,6 +283,9 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 		if (e.getKeyCode() == KeyEvent.VK_3) { //speed level 3
 			speedLevel = 3;
 			gameState = STATE_TWO_PLAYER_START;
+		}
+		if (e.getKeyCode() == KeyEvent.VK_C) { //speed level 3
+			System.out.println(gameState);
 		}
 	}
 
