@@ -19,19 +19,22 @@ public class Ball extends Rectangle {
 	public Ball(Paddle paddleLeft, Paddle paddleRight, int speed) {
 
 		super(905, ranNum.nextInt(225), 20, 20);
+		//Speed 1
 		if (speed == 1) {
+			//Serve in random direction
 			if (ranNum.nextInt(2) == 0) {
 				dy = 10;
 				dx = 10;
 			}
-
 			if (ranNum.nextInt(2) == 1) {
 				dy = 10;
 				dx = -10;
 			}
 		}
-
+		
+		//Speed 2
 		if (speed == 2) {
+			//Serve in random direction
 			if (ranNum.nextInt(2) == 0) {
 				dy = 15;
 				dx = 15;
@@ -42,13 +45,14 @@ public class Ball extends Rectangle {
 				dx = -15;
 			}
 		}
-
+		
+		//Speed 3
 		if (speed == 3) {
+			//Serve in random direction
 			if (ranNum.nextInt(2) == 0) {
 				dy = 20;
 				dx = 20;
 			}
-
 			if (ranNum.nextInt(2) == 1) {
 				dy = 20;
 				dx = -20;
@@ -59,6 +63,7 @@ public class Ball extends Rectangle {
 		right = paddleRight;
 	}
 
+	//Check if ball hits the paddle
 	public boolean BallCollides(Paddle paddle) {
 		boolean result = false;
 		if (this.intersects(paddle)) {
@@ -76,6 +81,8 @@ public class Ball extends Rectangle {
 		if ((this.getY() + 40 + dy > 900) || (this.getY() + dy < 0)) {
 			dy = -dy;
 		}
+		
+		//Move the ball
 		this.translate((int) dx, (int) dy);
 
 		// Hitting paddles
@@ -98,7 +105,6 @@ public class Ball extends Rectangle {
 				dy -= SMASH_BALL_SPEED_INCREASE_y;
 			}
 		}
-
 		if (BallCollides(right)) {
 			if (this.dy < 0 && right.dy > 0) {
 				dx -= SMASH_BALL_SPEED_INCREASE_X;

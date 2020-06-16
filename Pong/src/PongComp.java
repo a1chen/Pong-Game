@@ -5,10 +5,10 @@ import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class PongComp extends GameDriverV3 implements KeyListener{
-	
-	//Constants
-	//Different states
+public class PongComp extends GameDriverV3 implements KeyListener {
+
+	// Different states
+	static final int STATE_SPLASH_SCREEN = 0;
 	static final int STATE_TWO_PLAYER_START = 1;
 	static final int STATE_TWO_PLAYER_SCORED = 2;
 	static final int STATE_TWO_PLAYER_WON = 3;
@@ -16,59 +16,60 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 	static final int STATE_SINGLE_PLAYER_SERVE = 5;
 	static final int STATE_SINGLE_PLAYER_WON = 6;
 	static final int STATE_CHOOSE_SPEED = 7;
-	
-	//Score to win
+
+	// Score to win
 	static final int POINTS_TO_WIN = 3;
-	
-	
-	//initializing variables 
+
+	// initializing variables
 	Paddle left, right;
-	Rectangle background = new Rectangle ( 0,0, 6000, 4000);
-	int gameState = 0, speedLevel = 1;
-	int scoreRight = 0, scoreLeft = 0;
-	int numHitLeft = 0, numHitRight = 0;
+	Rectangle background = new Rectangle(0, 0, 6000, 4000);
+	int gameState = STATE_SPLASH_SCREEN, speedLevel = 1, scoreRight = 0, scoreLeft = 0, numHitLeft = 0, numHitRight = 0;
 	Ball ball;
-	Font impactSmall = new Font("Impact", 100,100);
+	Font impactSmall = new Font("Impact", 100, 100);
 	Font impactSmaller = new Font("Impact", 25, 25);
-	
+
 	Color cBlack = Color.BLACK;
 	Color cRed = Color.RED;
-	
-	boolean hasStartedGame = false; // prevent from player needing to keep choosing speed
-	
-	//starts the game
+
+	boolean hasStartedGame = false; 
+
+	// Starts the game creating paddles and balls
 	public void start() {
 		if (!hasStartedGame) { // prevent from player needing to keep choosing speed
-			
 			left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
-			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
+			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);
 			ball = new Ball(left, right, speedLevel);
 			this.addKeyListener(left);
 			this.addKeyListener(right);
-			gameState = STATE_CHOOSE_SPEED;
 			
-		} else {	
+			//Change screen to choosing states
+			gameState = STATE_CHOOSE_SPEED;
+		} else {
+			//Serves the ball
 			ball = new Ball(left, right, speedLevel);
 			gameState = STATE_TWO_PLAYER_START;
 		}
 	}
 	
-	public void compRestart() { //restarts the score for computer mode
+	// restarts the score for computer mode
+	public void compRestart() { 
 		scoreLeft = 0;
 		scoreRight = 0;
 		computerStart();
 	}
 	
-	public void restart() { // restarts the score for two player mode
+	// restarts the score for two player mode
+	public void restart() { 
 		scoreLeft = 0;
 		scoreRight = 0;
 		start();
 	}
 	
-	public void computerStart() { //computer mode
-		if(!hasStartedGame) {
+	// Single player mode
+	public void computerStart() { 
+		if (!hasStartedGame) {
 			left = new Paddle(5, this.getHeight() / 2, KeyEvent.VK_W, KeyEvent.VK_S);
-			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);		
+			right = new Paddle(1785, this.getHeight() / 2, KeyEvent.VK_UP, KeyEvent.VK_DOWN);
 			ball = new Ball(left, right, speedLevel);
 			this.addKeyListener(right);
 			gameState = STATE_SINGLE_PLAYER_START;
@@ -77,49 +78,53 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 			ball = new Ball(left, right, speedLevel);
 			gameState = STATE_SINGLE_PLAYER_START;
 		}
-		
+
 	}
-	
-	//score counter
-	public void CountScore(Ball ball){
-	
-		if (ball.getX() < 0) { //counts score if the ball goes past the left side
+
+	//Score counter
+	public void CountScore(Ball ball) {
+		// Counts score if the ball goes past the left side
+		if (ball.getX() < 0) { 
+			//Single player
 			if (gameState == STATE_SINGLE_PLAYER_START) {
 				scoreRight += 1;
 				gameState = STATE_SINGLE_PLAYER_SERVE;
-			}
-			else {
-				scoreRight +=1;
+			//Two player
+			} else {
+				scoreRight += 1;
 				gameState = STATE_TWO_PLAYER_SCORED;
 			}
 		}
-		
-		if (ball.getX() + ball.width > 1830 ) { //counts score if the ball goes past the right side
+		//Counts score if the ball goes past the right side
+		if (ball.getX() + ball.width > 1830) { 
+			//Single player
 			if (gameState == STATE_SINGLE_PLAYER_START) {
 				scoreLeft += 1;
 				gameState = STATE_SINGLE_PLAYER_SERVE;
-			}
-			else {
+				
+			//Two player
+			} else {
 				scoreLeft += 1;
 				gameState = STATE_TWO_PLAYER_SCORED;
 			}
 		}
-		
-		
-		if(scoreRight == POINTS_TO_WIN || scoreLeft == POINTS_TO_WIN) { //ends game if score reaches 3
-			if (gameState == STATE_SINGLE_PLAYER_SERVE) { //restarts in computer mode
+		//Ends game if score reaches POINTS_TO_WIN
+		if (scoreRight == POINTS_TO_WIN || scoreLeft == POINTS_TO_WIN) { 
+			//Change to won state
+			if (gameState == STATE_SINGLE_PLAYER_SERVE) { 
 				gameState = STATE_SINGLE_PLAYER_WON;
-			}
-			else {
-				gameState = STATE_TWO_PLAYER_WON; //restarts in two player mode
+			} else {
+				gameState = STATE_TWO_PLAYER_WON;
 			}
 		}
-		
+
 	}
-	
+
 	public void draw(Graphics2D win) {
 		// TODO Auto-generated method stub
-		if (gameState == 0) { //splash screen
+		// Splash Screen
+		if (gameState == STATE_SPLASH_SCREEN) { 
+			//Title
 			win.setColor(Color.BLACK);
 			win.fill(background);
 			win.setFont(impactSmall);
@@ -130,13 +135,15 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 			win.setFont(impactSmall);
 			win.setColor(Color.RED);
 			
-			win.drawString("LEFT PLAYER" , 100, 400);
-			win.drawString("W = UP",100 , 600);
-			win.drawString("S = DOWN",100 , 800);
+			//Instructions
+			win.drawString("LEFT PLAYER", 100, 400);
+			win.drawString("W = UP", 100, 600);
+			win.drawString("S = DOWN", 100, 800);
 			win.drawString("RIGHT PLAYER", 1200, 400);
 			win.drawString("UP ARROW = UP", 1150, 600);
 			win.drawString("DOWN ARROW = DOWN", 900, 800);
-
+			
+			//Gamemodes
 			win.setFont(impactSmaller);
 			win.setColor(Color.WHITE);
 			win.drawString("Press ENTER for two player mode", 100, 50);
@@ -146,37 +153,39 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 			this.addKeyListener(this);
 		}
 		
-		
-		if (gameState == STATE_TWO_PLAYER_START) {//game start in single player mode
+		//Game start in single player mode
+		if (gameState == STATE_TWO_PLAYER_START) {
+			//Draw lines
 			win.setColor(Color.BLACK);
 			win.fill(background);
 			win.setColor(Color.WHITE);
 			win.drawLine(915, 0, 915, 900);
 			win.drawOval(665, 200, 500, 500);
-			
-			//draw them
+
+			//Draw paddles and ball
 			left.moveAndDraw(win);
 			right.moveAndDraw(win);
 			ball.moveAndDraw(win);
 			
-			
+			//Keep score
 			CountScore(ball);
 			win.setFont(impactSmall);
-			win.drawString("Score" + " " +scoreLeft + " - "+ scoreRight , 675, 100);
-		
+			win.drawString("Score" + " " + scoreLeft + " - " + scoreRight, 675, 100);
+
 		}
 		
-		if(gameState == STATE_TWO_PLAYER_SCORED) { //state if player scores in two player mode
-			
+		//State if player scores in two player mode
+		if (gameState == STATE_TWO_PLAYER_SCORED) { 
 			win.setFont(impactSmall);
 			win.setColor(Color.WHITE);
 			win.drawString("Press ENTER to Serve", 600, 300);
 			this.addKeyListener(this);
-			
+
 		}
 		
-		if(gameState == STATE_TWO_PLAYER_WON) { //state if player wins in two player mode
-			
+		//State if a player wins in two player mode
+		if (gameState == STATE_TWO_PLAYER_WON) { 
+			//Left player won
 			if (scoreLeft == POINTS_TO_WIN) {
 				win.setFont(impactSmall);
 				win.setColor(Color.WHITE);
@@ -185,6 +194,7 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 				this.addKeyListener(this);
 			}
 			
+			//Right player won
 			if (scoreRight == POINTS_TO_WIN) {
 				win.setFont(impactSmall);
 				win.setColor(Color.WHITE);
@@ -194,30 +204,36 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 			}
 		}
 		
-		if (gameState == STATE_SINGLE_PLAYER_START) { //state to start single player mode
-		
+		//State to start single player mode
+		if (gameState == STATE_SINGLE_PLAYER_START) { 
+			//Draw background
 			win.setColor(Color.BLACK);
 			win.fill(background);
-			//draw them
-			left.computer(win,ball,left);
-			right.moveAndDraw(win);
-			ball.moveAndDraw(win);
-			CountScore(ball);
-			win.setFont(impactSmall);
-			win.drawString("Score" + " " +scoreLeft + " - "+ scoreRight , 675, 100);
-			win.setColor(Color.WHITE);
 			win.drawLine(915, 0, 915, 900);
 			win.drawOval(665, 200, 500, 500);
 			
+			//Draw paddles and ball
+			left.computer(win, ball, left);
+			right.moveAndDraw(win);
+			ball.moveAndDraw(win);
+			
+			//Keep score
+			CountScore(ball);
+			win.setFont(impactSmall);
+			win.drawString("Score" + " " + scoreLeft + " - " + scoreRight, 675, 100);
+			win.setColor(Color.WHITE);
 		}
 		
-		if (gameState == STATE_SINGLE_PLAYER_SERVE) { //state to serve ball in single player mode
+		//State to serve ball in single player mode
+		if (gameState == STATE_SINGLE_PLAYER_SERVE) { 
 			win.setFont(impactSmall);
 			win.setColor(Color.WHITE);
 			win.drawString("Press \"T\" to serve", 550, 450);
 			this.addKeyListener(this);
 		}
-		if (gameState == STATE_SINGLE_PLAYER_WON) { //state to restart game in single player mode
+		//State to restart game in single player mode
+		if (gameState == STATE_SINGLE_PLAYER_WON) {
+			//Left player has won
 			if (scoreLeft == POINTS_TO_WIN) {
 				win.setFont(impactSmall);
 				win.setColor(Color.WHITE);
@@ -226,80 +242,82 @@ public class PongComp extends GameDriverV3 implements KeyListener{
 				this.addKeyListener(this);
 			}
 			
+			//Right player has won
 			if (scoreRight == POINTS_TO_WIN) {
 				win.setFont(impactSmall);
 				win.setColor(Color.WHITE);
 				win.drawString("Right player is the winner!", 350, 450);
 				win.drawString("Press \"g\" to restart", 550, 550);
 				this.addKeyListener(this);
-		
 			}
-		
 		}
-		if (gameState == STATE_CHOOSE_SPEED) { //state to choose speed of ball
+		//State to choose speed of ball
+		if (gameState == STATE_CHOOSE_SPEED) { 
 			hasStartedGame = true;
-
+			
+			//Draw background
 			win.setColor(Color.BLACK);
 			win.fill(background);
-			
 			win.setColor(Color.RED);
 			win.setFont(impactSmall);
 			win.drawString("SPEED LEVEL", 650, 100);
 			
+			//Speed options
 			win.setColor(Color.WHITE);
 			win.drawString("Press 1 for Normal Speed", 400, 300);
 			win.drawString("Press 2 for Fast Speed", 450, 500);
 			win.drawString("Press 3 for Super Speed", 425, 700);
 			this.addKeyListener(this);
 		}
-		
+
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == KeyEvent.VK_ENTER) { //starts in two player mode
+		//Starts in two player mode
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) { 
 			start();
 		}
-		
-		if (e.getKeyCode() == KeyEvent.VK_I) { //resets score
+		//Resets score
+		if (e.getKeyCode() == KeyEvent.VK_I) { 
 			restart();
 		}
-		
-		if (e.getKeyCode() == KeyEvent.VK_T) { //single player mode
+		//Single player mode
+		if (e.getKeyCode() == KeyEvent.VK_T) { 
 			computerStart();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_G) { //single player mode restart
+		//Single player mode restart
+		if (e.getKeyCode() == KeyEvent.VK_G) { 
 			compRestart();
 		}
-		if (e.getKeyCode() == KeyEvent.VK_1) {//speed level 1
+		//Speed level 1
+		if (e.getKeyCode() == KeyEvent.VK_1) {
 			speedLevel = 1;
 			gameState = STATE_TWO_PLAYER_START;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_2) { //speed level 2
+		//Speed level 2
+		if (e.getKeyCode() == KeyEvent.VK_2) { 
 			speedLevel = 2;
 			gameState = STATE_TWO_PLAYER_START;
 		}
-		if (e.getKeyCode() == KeyEvent.VK_3) { //speed level 3
+		//Speed level 3
+		if (e.getKeyCode() == KeyEvent.VK_3) {
 			speedLevel = 3;
 			gameState = STATE_TWO_PLAYER_START;
-		}
-		if (e.getKeyCode() == KeyEvent.VK_C) { //speed level 3
-			System.out.println(gameState);
 		}
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
-	
 }
